@@ -14,3 +14,4 @@ def metrics(chat_id):
     pdf = create_pdf()
     print("PDF: ", pdf)
     return StreamingResponse(pdf, media_type="application/pdf")
+
