@@ -32,10 +32,10 @@ async def process_file(content):
 
 
 async def save_file_on_bucket(file_id, content):
-    BUCKET_NAME = "whatsapp-convs"
-    AWS_ACCESS_KEY_ID = os.getenv("AWS_ACCESS_KEY_ID")
-    AWS_SECRET_KEY_ID = os.getenv("AWS_SECRET_KEY_ID")
-    ENDPOINT = os.getenv("S3_ENDPOINT")
+    BUCKET_NAME = "conversations"
+    AWS_ACCESS_KEY_ID ="SiN8vvuMINEktHMxgcNI" #os.getenv("AWS_ACCESS_KEY_ID")
+    AWS_SECRET_KEY_ID = "LXicnUTByAhOUucapvCN6jMH3IqB9Xb5UPAlRSrL"# os.getenv("AWS_SECRET_KEY_ID")
+    ENDPOINT = "http://s3:9000" #os.getenv("S3_ENDPOINT")
     print(AWS_SECRET_KEY_ID)
     print(AWS_ACCESS_KEY_ID)
 
@@ -49,7 +49,7 @@ async def save_file_on_bucket(file_id, content):
                    verify=False
                 )
 
-    return await s3_client.Bucket(BUCKET_NAME).put_object(Key=f"{file_id}.txt", Body=content)
+    return s3_client.Bucket(BUCKET_NAME).put_object(Key=f"{file_id}.txt", Body=content)
 
 async def read_file(file_id: uuid.UUID):
     BUCKET_NAME = "whatsapp-convs"

@@ -22,7 +22,7 @@ async def parse(file: UploadFile = File(...)):
     file_content = await file.read()
     status = await process_file(file_content)
     print(f"Status {status}")
-    return {"Status": "parsed"}
+    return {"status": "parsed", "file_id": status.key}
 
 #TODO: use pydantic for id validation
 @router.get("/metrics")
