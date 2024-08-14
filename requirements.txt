@@ -1,5 +1,9 @@
 fastapi
 pandas
 boto3
+botocore
 requests
 uvicorn
+matplotlib
+python-dotenv
+python-multipart

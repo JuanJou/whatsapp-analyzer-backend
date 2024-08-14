@@ -1,8 +1,11 @@
 from fastapi import UploadFile
 import uuid
+import io
 from db.models import File, FileData
 from .analyzer import parse_file, parse_pickle
 import boto3
+import pickle
+from botocore.exceptions import NoCredentialsError, PartialCredentialsError
 import os
 
 
@@ -26,36 +29,40 @@ def is_valid_uuid(uuid_to_test):
 
 async def process_file(content):
     uuid_for_file = uuid.uuid4()
-    #dataframe_with_lines = await parse_file(lines)
-    #dataframe_with_lines.to_pickle(f"{uuid_for_file}")
-    return await save_file_on_bucket(uuid_for_file, content)
+    dataframe_with_lines = await parse_file(content)
+    pickle_buffer = io.BytesIO()
+    pickle.dump(dataframe_with_lines, pickle_buffer)
+    pickle_buffer.seek(0)
+
+    return save_file_on_bucket(uuid_for_file, pickle_buffer)
 
 
-async def save_file_on_bucket(file_id, content):
+def save_file_on_bucket(file_id, content):
     BUCKET_NAME = "conversations"
-    AWS_ACCESS_KEY_ID ="SiN8vvuMINEktHMxgcNI" #os.getenv("AWS_ACCESS_KEY_ID")
-    AWS_SECRET_KEY_ID = "LXicnUTByAhOUucapvCN6jMH3IqB9Xb5UPAlRSrL"# os.getenv("AWS_SECRET_KEY_ID")
-    ENDPOINT = "http://s3:9000" #os.getenv("S3_ENDPOINT")
-    print(AWS_SECRET_KEY_ID)
-    print(AWS_ACCESS_KEY_ID)
+    AWS_ACCESS_KEY = os.getenv("AWS_ACCESS_KEY")
+    AWS_SECRET_KEY = os.getenv("AWS_SECRET_KEY")
+    ENDPOINT = "http://s3:9000"
 
-    print("Starting upload...")
-    s3_client = boto3.resource('s3',
-                   endpoint_url=ENDPOINT,
-                   aws_access_key_id=AWS_ACCESS_KEY_ID,
-                   aws_secret_access_key=AWS_SECRET_KEY_ID,
-                   aws_session_token=None,
-                   config=boto3.session.Config(signature_version='s3v4'),
-                   verify=False
-                )
+    try:
+        print("Starting upload...")
+        s3_client = boto3.resource('s3',
+                       endpoint_url=ENDPOINT,
+                       aws_access_key_id=AWS_ACCESS_KEY,
+                       aws_secret_access_key=AWS_SECRET_KEY,
+                       aws_session_token=None,
+                       config=boto3.session.Config(signature_version='s3v4'),
+                       verify=False
+                    )
 
-    return s3_client.Bucket(BUCKET_NAME).put_object(Key=f"{file_id}.txt", Body=content)
+        return s3_client.Bucket(BUCKET_NAME).put_object(Key=f"{file_id}.pkl", Body=content)
+    except NoCredentialsError:
+        print("No credentials error")
+    except PartialCredentialsError:
+        print("Missing credentials error")
+    except Exception as e:
+        print(f"Unkown error: {e}")
 
 async def read_file(file_id: uuid.UUID):
-    BUCKET_NAME = "whatsapp-convs"
-    AWS_ACCESS_KEY_ID = os.getenv("AWS_ACCESS_KEY_ID")
-    AWS_SECRET_KEY_ID = os.getenv("AWS_SECRET_KEY_ID")
-    ENDPOINT = os.getenv("S3_ENDPOINT")
 
 
     s3_client = boto3.client('s3',

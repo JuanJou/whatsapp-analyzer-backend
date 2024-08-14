@@ -5,11 +5,13 @@ from routes import file as f
 import os
 from dotenv import load_dotenv
 
+load_dotenv()
+print("ENVIRONMENT",os.environ)
 
 app = FastAPI()
 
 origins = [
-        "http://localhost:3000",
+        "http://localhost:5173",
 ]
 
 app.add_middleware(

@@ -20,7 +20,7 @@ def get_current_user(user):
 async def parse(file: UploadFile = File(...)):
     print(f"File: {file}")
     file_content = await file.read()
-    status = await process_file(file_content)
+    status = await process_file(file_content.decode("utf-8"))
     print(f"Status {status}")
     return {"status": "parsed", "file_id": status.key}
 
