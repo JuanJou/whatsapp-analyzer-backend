@@ -1,5 +1,4 @@
 import pandas as pd
-from fastapi import UploadFile
 import re
 from datetime import datetime
 
@@ -18,7 +17,7 @@ async def parse_file(lines: str):
             pass
     return processed_file
 
-def process_line(line):
+def process_line(line: str):
     #10/3/2024, 12:44 - +54 9 11 3763-1285: Muchas Gracias !!! Ya compre entradas.
     regex_result = re.search("^(\d{1,2}\/\d{1,2}\/\d{4}), (\d\d:\d\d) - (\+(\d*) (?:9 (\d*)|([()\d\w\s-]*))([()\d\w\s-]*)): ([\s\S]*)$", line)
     raw_message = line

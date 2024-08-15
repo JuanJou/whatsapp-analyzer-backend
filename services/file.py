@@ -2,6 +2,7 @@ from fastapi import UploadFile
 import uuid
 import io
 from db.models import File, FileData
+from .vectorization import vectorize
 from .analyzer import parse_file, parse_pickle
 import boto3
 import pickle
@@ -28,13 +29,18 @@ def is_valid_uuid(uuid_to_test):
     return "Valid Uuid"
 
 async def process_file(content):
-    uuid_for_file = uuid.uuid4()
+
+    uuid_for_file = str(uuid.uuid4())
     dataframe_with_lines = await parse_file(content)
+
     pickle_buffer = io.BytesIO()
     pickle.dump(dataframe_with_lines, pickle_buffer)
     pickle_buffer.seek(0)
 
-    return save_file_on_bucket(uuid_for_file, pickle_buffer)
+    file = save_file_on_bucket(uuid_for_file, pickle_buffer)
+
+    vectorize(uuid_for_file)
+    return file
 
 
 def save_file_on_bucket(file_id, content):
