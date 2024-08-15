@@ -69,12 +69,15 @@ def save_file_on_bucket(file_id, content):
         print(f"Unkown error: {e}")
 
 async def read_file(file_id: uuid.UUID):
-
+    BUCKET_NAME = "conversations"
+    AWS_ACCESS_KEY = os.getenv("AWS_ACCESS_KEY")
+    AWS_SECRET_KEY = os.getenv("AWS_SECRET_KEY")
+    ENDPOINT = "http://s3:9000"
 
     s3_client = boto3.client('s3',
                    endpoint_url=ENDPOINT,
-                   aws_access_key_id=AWS_ACCESS_KEY_ID,
-                   aws_secret_access_key=AWS_SECRET_KEY_ID,
+                   aws_access_key_id=AWS_ACCESS_KEY,
+                   aws_secret_access_key=AWS_SECRET_KEY,
                    aws_session_token=None,
                    config=boto3.session.Config(signature_version='s3v4'),
                    verify=False

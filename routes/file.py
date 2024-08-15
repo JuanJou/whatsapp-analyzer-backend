@@ -1,6 +1,6 @@
 from typing import Annotated
 from fastapi import APIRouter, UploadFile, File, Depends, Query, Security
-from services.file import validate, is_valid_uuid, process_file
+from services.file import validate, is_valid_uuid, process_file, read_file
 import uuid
 
 
